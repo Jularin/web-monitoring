@@ -78,22 +78,22 @@ class App:
     # TODO add logging!
     def check_site(self, url: str, check_type):
         """Get request to site"""
+#        logging.debug('Checking {}'.format(url))
         current_time = str(datetime.now())[:-7]
         error = 'None'
         status = 'ok'
         try:
             response = r.get(url, allow_redirects=True, timeout=self.connection_timeout)
-            if response.status_code >= 400:
+            try:
+                response.raise_for_status()  # trying call error
+            except Exception as e:
                 status = 'error'
-                error = "Some error here"
+                error = e
+
             if check_type == "insert":
                 insert_into_db(url, current_time, response.status_code, status, error, response.url)
             elif check_type == "update":
                 update_response(url, current_time, response.status_code, status, error, response.url)
-        except r.ConnectionError as e:  # wrong url
-            print(e, "NOT CONNECTED ")
-            print(url)
-            print("Error: {} \nPlease delete this url from file or correct url".format(e))
 
         except Exception as e:
             print(e)
@@ -108,10 +108,11 @@ class App:
 if __name__ == '__main__':  # starting program
     urls = get_list_of_urls("urls.txt")  # get list of urls
     data = get_list_from_db()
-    timeout_between_requests = 60
+    timeout_between_requests = 10
     max_threads_count = 500
     app = App(timeout_between_requests=timeout_between_requests, urls=urls, data=data, connection_timeout=10,
               max_threads_count=max_threads_count)
+    # app.add_new_url_in_db()  # adding new urls from urls.txt
     while 1:  # checking old urls in db
         app.time_processing()
         time.sleep(timeout_between_requests + 1)
