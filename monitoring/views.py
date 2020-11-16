@@ -27,6 +27,7 @@ def add(request):
     return render(request, 'monitoring/urls.html', context)
 
 
+# replace this class to tasks.py
 class Monitoring:
     def __init__(self, timeout_between_requests, urls, connection_timeout, max_threads_count,
                  data):
