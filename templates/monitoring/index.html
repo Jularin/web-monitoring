@@ -1,0 +1,15 @@
+{% extends 'monitoring/base.html' %}
+
+{% block title%}
+    {{ title }}
+{% endblock %}
+
+{% block content %}
+    <h1>Main page:</h1>
+    {% for i in urls %}
+        <br>
+        <h1>URL: {{ i.url }}</h1>
+        <h1>ERROR: {{ i.error }}</h1>
+    {% endfor %}
+
+{% endblock %}
