@@ -57,7 +57,6 @@ class Monitoring:
     # TODO add logging!
     def check_site(self, url: str):
         """Get request to site"""
-        #        logging.debug('Checking {}'.format(url))
         current_time = str(datetime.now())[:-7]
         error = 'None'
         status = 'ok'
@@ -70,9 +69,8 @@ class Monitoring:
                     status = 'error'
                     error = e
 
-                my_url = Url(url=url, last_check_time=current_time, status_code=response.status_code,
-                             status=status, error=error, final_url=response.url)
-                my_url.save()
+                Url.objects.create(url=url, last_check_time=current_time, status_code=response.status_code,
+                                   status=status, error=error, final_url=response.url)
                 self.data = Url.objects.all()  # updating data
         except Exception as e:
             print(e)
@@ -88,6 +86,3 @@ class Monitoring:
             if url_in_db == url:
                 return True
         return False
-
-
-
