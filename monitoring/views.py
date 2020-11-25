@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 from .models import Url
 from .forms import UrlForm
 import requests as r
@@ -6,11 +7,23 @@ from datetime import datetime
 import threading
 import time
 from django.views.decorators.csrf import csrf_exempt
+from json import dumps
 
 
 def index(request):
     urls = Url.objects.all()
     return render(request, 'monitoring/index.html', {'title': 'Main page', 'urls': urls})
+
+
+def status(request):
+    result_json = {}
+    for row in Url.objects.all():
+        result_json['{}'.format(row.url)] = {'last_check_time': row.last_check_time,
+                                             'status_code': row.status_code,
+                                             'status': row.status,
+                                             'error': row.error,
+                                             'final_url': row.final_url}
+    return HttpResponse(dumps(result_json))
 
 
 @csrf_exempt  # чтобы Post запрос без csrf token
@@ -85,7 +98,7 @@ def checking_in_db(url):
 def send_request(url: Url):
     """Get request to site"""
     current_time = str(datetime.now())[:-7]
-    error = 'None'
+    error = 'null'
     status = 'ok'
     try:
         if not checking_in_db(url):
