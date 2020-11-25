@@ -4,16 +4,10 @@
 #celery -A tasks beat
 """
 import celery
-from datetime import datetime
-import time
-import threading
-
 import os
 from django.core.wsgi import get_wsgi_application
 os.environ['DJANGO_SETTINGS_MODULE'] = 'djangoProject.settings'
 application = get_wsgi_application()
-from monitoring.models import Url
-import requests as r
 from monitoring.views import time_processing
 
 
