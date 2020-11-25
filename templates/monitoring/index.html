@@ -7,9 +7,14 @@
 {% block content %}
     <h1>Main page:</h1>
     {% for i in urls %}
-        <br>
-        <h1>URL: {{ i.url }}</h1>
-        <h1>ERROR: {{ i.error }}</h1>
+        <div>
+            <br>
+            <h2>URL: {{ i.url }}</h2>
+            <h4>Last check time:  {{ i.last_check_time }}</h4>
+            <h4>Status: {{ i.status }}</h4>
+            <h4>ERROR: {{ i.error }}</h4>
+            <h4>Final Url:  {{ i.final_url }}</h4>
+        </div>
     {% endfor %}
 
 {% endblock %}
