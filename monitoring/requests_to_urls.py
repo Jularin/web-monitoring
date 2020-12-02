@@ -63,7 +63,7 @@ def checking_in_db(url):
 
 def send_request(url: Url):
     """Get request to site"""
-    current_time = str(datetime.now())[:-7]
+    current_time = datetime.now()
     error = 'null'
     status = 'ok'
     try:
