@@ -21,18 +21,7 @@ def time_processing():
     urls = Url.objects.all()
     urls_to_update = []
     for url in urls:
-        url_last_check_time = url.last_check_time
-
-        # TODO move to DateTimeField
-        date = (
-                datetime.now() -
-                datetime(  # *args where args it is a list with int of time
-                    *list(map(int, url_last_check_time[:url_last_check_time.index(" ")].split("-"))) +
-                     list(map(int, url_last_check_time[url_last_check_time.index(" ") + 1:].split(":")))
-                )
-        )
-
-        if date.seconds > timeout:  # if time from last check more than variable timeout
+        if (datetime.now() - url.last_check_time).seconds > timeout:
             urls_to_update.append(url)
 
     # TODO celery
@@ -42,18 +31,16 @@ def time_processing():
         check_old_url(url)
 
 
-# TODO add logging!
-# TODO rename function
-def check_new_site(url: str):
-    """Get request to site"""
+def process_new_url(url: str):
+    """Adding new url in database"""
     # creating new model with null values
     Url.objects.create(
         url=url,
-        last_check_time='1970-01-01 00:00:00',
+        last_check_time=None,
         status_code=0,
         status=None,  # TODO refactor to None
-        error='null',
-        final_url='null'
+        error=None,
+        final_url=None
     )
 
 
@@ -71,7 +58,7 @@ def add_new_url_in_db(urls):
     for url in urls:
         while threading.active_count() > max_threads_count:
             time.sleep(10)  # script sleeping
-        threading.Thread(target=check_new_site, args=[url]).start()  # creating thread
+        threading.Thread(target=process_new_url, args=[url]).start()  # creating thread
 
 
 def checking_in_db(url):
