@@ -1,9 +1,12 @@
-from .models import Url
-import requests as r
-from datetime import datetime
 import threading
 import time
+from datetime import datetime
 
+import requests as r
+
+from .models import Url
+
+# TODO rename to services
 
 connection_timeout = 10
 max_threads_count = 100
@@ -11,18 +14,28 @@ timeout = 200
 
 
 def time_processing():
-    """This func check's datetime from db and if past more than variable timeout,
-    add in list urls_to_update urls which need to update"""
-    models_in_db = Url.objects.all()
-    data = [models_in_db[x] for x in range(len(models_in_db))]
+    """
+    This func check's datetime from db and if past more than variable timeout,
+    add in list urls_to_update urls which need to update
+    """
+    urls = Url.objects.all()
     urls_to_update = []
-    for i in range(len(models_in_db)):
-        url_last_check_time = data[i].last_check_time
-        if (datetime.now() - datetime(  # *args where args it is a list with int of time
-                *list(map(int, url_last_check_time[:url_last_check_time.index(" ")].split("-"))) +
-                 list(map(int, url_last_check_time[url_last_check_time.index(" ") + 1:].split(":"))))
-        ).seconds > timeout:  # if time from last check more than variable timeout
-            urls_to_update.append(data[i])
+    for url in urls:
+        url_last_check_time = url.last_check_time
+
+        # TODO move to DateTimeField
+        date = (
+                datetime.now() -
+                datetime(  # *args where args it is a list with int of time
+                    *list(map(int, url_last_check_time[:url_last_check_time.index(" ")].split("-"))) +
+                     list(map(int, url_last_check_time[url_last_check_time.index(" ") + 1:].split(":")))
+                )
+        )
+
+        if date.seconds > timeout:  # if time from last check more than variable timeout
+            urls_to_update.append(url)
+
+    # TODO celery
     for url in urls_to_update:
         while threading.active_count() > max_threads_count:
             time.sleep(10)  # script sleeping
@@ -30,10 +43,18 @@ def time_processing():
 
 
 # TODO add logging!
+# TODO rename function
 def check_new_site(url: str):
     """Get request to site"""
-    Url.objects.create(url=url, last_check_time='1970-01-01 00:00:00', status_code=0,
-                       status='null', error='null', final_url='null')  # creating new model with null values
+    # creating new model with null values
+    Url.objects.create(
+        url=url,
+        last_check_time='1970-01-01 00:00:00',
+        status_code=0,
+        status=None,  # TODO refactor to None
+        error='null',
+        final_url='null'
+    )
 
 
 def check_old_url(url: Url):
@@ -54,11 +75,7 @@ def add_new_url_in_db(urls):
 
 
 def checking_in_db(url):
-    data = Url.objects.all()
-    for url_in_db in list(data[x].url for x in range(len(data))):
-        if url_in_db == url:
-            return True
-    return False
+    return Url.objects.filter(url=url).exists()
 
 
 def send_request(url: Url):

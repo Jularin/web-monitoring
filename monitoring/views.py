@@ -1,9 +1,11 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from .models import Url
-from .forms import UrlForm
-from django.views.decorators.csrf import csrf_exempt
 from json import dumps
+
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+
+from .forms import UrlForm
+from .models import Url
 from .requests_to_urls import add_new_url_in_db
 
 
@@ -13,14 +15,17 @@ def index(request):
 
 
 def status(request):
+    # TODO Django Rest Framework
     result_json = {}
     for row in Url.objects.all():
-        result_json['{}'.format(row.url)] = {'last_check_time': row.last_check_time,
-                                             'status_code': row.status_code,
-                                             'status': row.status,
-                                             'error': row.error,
-                                             'final_url': row.final_url}
-    return HttpResponse(dumps(result_json))
+        result_json[row.url] = {
+            'last_check_time': row.last_check_time,
+            'status_code': row.status_code,
+            'status': row.status,
+            'error': row.error,
+            'final_url': row.final_url
+        }
+    return HttpResponse(dumps(result_json), content_type='application/json')
 
 
 @csrf_exempt  # чтобы Post запрос без csrf token
