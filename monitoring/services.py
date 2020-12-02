@@ -6,7 +6,6 @@ import requests as r
 
 from .models import Url
 
-# TODO rename to services
 
 connection_timeout = 10
 max_threads_count = 100
