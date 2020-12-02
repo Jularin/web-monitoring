@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .forms import UrlForm
 from .models import Url
-from .requests_to_urls import add_new_url_in_db
+from .services import add_new_url_in_db
 
 
 def index(request):

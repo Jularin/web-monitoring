@@ -7,7 +7,7 @@ import os
 
 from djangoProject.celery import app
 
-from monitoring.requests_to_urls import time_processing
+from monitoring.services import time_processing
 
 
 
