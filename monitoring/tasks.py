@@ -10,7 +10,6 @@ from djangoProject.celery import app
 from monitoring.services import time_processing
 
 
-
 @app.task
 def check():
     time_processing()
