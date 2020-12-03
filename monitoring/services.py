@@ -37,7 +37,7 @@ def process_new_url(url: str):
         url=url,
         last_check_time=None,
         status_code=0,
-        status=None,  # TODO refactor to None
+        status=None,
         error=None,
         final_url=None
     )
