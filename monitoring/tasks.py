@@ -3,7 +3,7 @@ To run celery:
 celery -A tasks worker
 celery -A tasks beat
 """
-import os
+
 
 from djangoProject.celery import app
 

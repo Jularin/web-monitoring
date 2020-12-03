@@ -21,7 +21,7 @@ def debug_task(self):
 
 app.conf.beat_schedule = {
     'urls-update': {
-        'task': 'tasks.check',
+        'task': 'monitoring.tasks.check',
         'schedule': 120.0
     }
 }
