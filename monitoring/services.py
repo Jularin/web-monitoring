@@ -2,15 +2,20 @@ import threading
 import time
 from datetime import datetime
 import multiprocessing
+import os
+# я понимаю что так нельзя, но я не смог запустить без этого celery worker
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djangoProject.settings")
+from django.core.wsgi import get_wsgi_application
+
+application = get_wsgi_application()
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 import requests as r
 
 from .models import Url
 
-
 connection_timeout = 10
 timeout = 200
-processes_count = 10
 
 
 def time_processing():
@@ -21,16 +26,14 @@ def time_processing():
     urls = Url.objects.all()
     urls_to_update = []
     for url in urls:
+        # TODO refactor with objects(filter=)
         if (datetime.now() - url.last_check_time.replace(tzinfo=None)).seconds > timeout:
             urls_to_update.append(url)
 
     # TODO celery
-    #for url in urls_to_update:
-     #   while threading.active_count() > max_threads_count:
-      #      time.sleep(10)  # script sleeping
-
-    with multiprocessing.Pool(processes_count) as p:
-        p.map(check_old_url, urls_to_update)
+    if urls_to_update:
+        with multiprocessing.Pool() as p:
+            p.map(check_old_url, urls_to_update)
 
 
 def process_new_url(url: str):
