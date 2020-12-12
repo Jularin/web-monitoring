@@ -73,7 +73,7 @@ def checking_in_db(url):
 def send_request(url: Url):
     """Get request to site"""
     current_time = datetime.now()
-    error = 'null'
+    error = None
     status = 'ok'
     try:
         if not checking_in_db(url):
@@ -90,5 +90,5 @@ def send_request(url: Url):
     except Exception as e:
         status = 'error'
         print(e)
-        return {'url': url, 'last_check_time': current_time, 'status_code': 'null', 'status': status, 'error': e,
-                'final_url': 'null'}
+        return {'url': url, 'last_check_time': current_time, 'status_code': None, 'status': status, 'error': e,
+                'final_url': None}
