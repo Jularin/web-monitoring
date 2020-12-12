@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
+import time
 
 from monitoring.services import time_processing
 
@@ -8,4 +9,6 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        pass
+        while 1:
+            time_processing()
+            time.sleep(60)

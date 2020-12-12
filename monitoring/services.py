@@ -32,8 +32,11 @@ def time_processing():
 
     # TODO celery
     if urls_to_update:
-        with multiprocessing.Pool() as p:
-            p.map(check_old_url, urls_to_update)
+        try:
+            with multiprocessing.Pool() as p:
+                p.map(check_old_url, urls_to_update)
+        except Exception as e:
+            print(e)
 
 
 def process_new_url(url: str):
