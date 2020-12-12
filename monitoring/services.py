@@ -30,11 +30,10 @@ def time_processing():
         if (datetime.now() - url.last_check_time.replace(tzinfo=None)).seconds > timeout:
             urls_to_update.append(url)
 
-    # TODO celery
     if urls_to_update:
         try:
             with multiprocessing.Pool() as p:
-                p.map(check_old_url, urls_to_update)
+               p.map(check_old_url, urls_to_update)
         except Exception as e:
             print(e)
 
@@ -69,26 +68,21 @@ def add_new_url_in_db(urls):
         threading.Thread(target=process_new_url, args=[url]).start()  # creating thread
 
 
-def checking_in_db(url):
-    return Url.objects.filter(url=url).exists()
-
-
 def send_request(url: Url):
     """Get request to site"""
     current_time = datetime.now()
     error = None
     status = 'ok'
     try:
-        if not checking_in_db(url):
-            response = r.get(url.url, allow_redirects=True, timeout=connection_timeout)
-            try:
-                response.raise_for_status()  # trying call error
-            except Exception as e:
-                status = 'error'
-                error = e
-            return {'url': url, 'last_check_time': current_time, 'status_code': response.status_code, 'status': status,
-                    'error': error,
-                    'final_url': response.url}
+        response = r.get(url.url, allow_redirects=True, timeout=connection_timeout)
+        try:
+            response.raise_for_status()  # trying call error
+        except Exception as e:
+            status = 'error'
+            error = e
+        return {'url': url, 'last_check_time': current_time, 'status_code': response.status_code, 'status': status,
+                'error': error,
+                'final_url': response.url}
 
     except Exception as e:
         status = 'error'

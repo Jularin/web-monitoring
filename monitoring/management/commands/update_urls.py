@@ -12,3 +12,4 @@ class Command(BaseCommand):
         while 1:
             time_processing()
             time.sleep(60)
+            self.stdout.write("One iteration is done")
