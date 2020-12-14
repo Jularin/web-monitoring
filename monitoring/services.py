@@ -27,7 +27,7 @@ def time_processing():
     urls_to_update = []
     for url in urls:
         # TODO refactor with objects(filter=)
-        if (datetime.now() - url.last_check_time.replace(tzinfo=None)).seconds > timeout:
+        if (datetime.now() - url.last_check_time).seconds > timeout:
             urls_to_update.append(url)
 
     if urls_to_update:
@@ -63,9 +63,7 @@ def check_old_url(url: Url):
 
 def add_new_url_in_db(urls):
     for url in urls:
-        while threading.active_count() > max_threads_count:
-            time.sleep(10)  # script sleeping
-        threading.Thread(target=process_new_url, args=[url]).start()  # creating thread
+        process_new_url(url)
 
 
 def send_request(url: Url):
